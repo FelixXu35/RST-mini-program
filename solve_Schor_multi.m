@@ -1,5 +1,5 @@
-function waveFunc = solve_Schor(lowerLim, upperLim, lowerBC, upperBC, numOfResult, potenetialFunc)
-%solve_Schor - This is the function used to solve the Schordinger equation
+function waveFunc = solve_Schor_multi(lowerLim, upperLim, lowerBC, upperBC, numOfResult, potenetialFunc)
+%solve_Schor_multi - This is the function used to solve the Schordinger equation
 %
 % Syntax: waveFunc = solve_Schor(lowerLim, upperLim, boundryComdition, potenetialFunc)
 %
@@ -22,15 +22,16 @@ function waveFunc = solve_Schor(lowerLim, upperLim, lowerBC, upperBC, numOfResul
     stepLength = 1e-3; 
     numOfSteps = (upperLim - lowerLim) / stepLength + 1;
     position = lowerLim: stepLength: upperLim;
-    waveFunc = zeros(numOfResult, numOfSteps);
-    newFunc = zeros(numOfResult, numOfSteps);
-    oldFunc = zeros(numOfResult, numOfSteps);
-    newFunc(1, 1) = lowerBC;
-    newFunc(2, 1) = upperBC;
-    energy = min(potenetialFunc(position))
-
+    waveFunc = zeros(2 * numOfResult, numOfSteps);
+    newFunc = zeros(2 * numOfResult, numOfSteps);
+    oldFunc = zeros(2 * numOfResult, numOfSteps);
+    energy = min(potenetialFunc(position));
+    for resultIndex = 1: numOfResult
+        newFunc(2 * numOfResult - 1, 1) = lowerBC;
+        newFunc(2 * numOfResult - 1, numOfSteps) = upperBC;
+    end
     %% find the result
-    for resultIndex = 1: numbOfResult
+    while resultIndex ~= numOfResult
         while signal == false
             oldFunc = newFunc;
             %% Evolve the differential equation
@@ -40,9 +41,13 @@ function waveFunc = solve_Schor(lowerLim, upperLim, lowerBC, upperBC, numOfResul
             end
             if (newFunc(2 * resultIndex - 1, numOfSteps) - upperBC) * (oldFunc(resultIndex, numOfSteps) - upperBC) < 0
                 signal = true;
+            else
+                energy = energy + 1; % if the result is not in this interval, search next interval
+                newFunc()
             end
         end
         signal = false;
+        numOfResult = numOfResult + 1; % search for next result
     end
     
 end
